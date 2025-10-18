@@ -39,14 +39,17 @@ La plataforma cuenta con 3 roles principales:
 - **Frontend**: Next.js 15, React, TypeScript
 - **Estilos**: Tailwind CSS v4, shadcn/ui
 - **Mapas**: Leaflet con OpenStreetMap
-- **Backend (Preparado)**: Firebase/Firestore
-- **Autenticación (Preparado)**: Firebase Auth
+- **Backend**: MySQL + Next.js API Routes
+- **Base de datos**: MySQL Workbench (local)
 
 ## Instalación
 
 \`\`\`bash
 # Instalar dependencias
 npm install
+
+# Configurar base de datos MySQL (ver MYSQL_SETUP.md)
+# Ejecutar scripts en database/schema.sql y database/seed.sql
 
 # Ejecutar en desarrollo
 npm run dev
@@ -55,40 +58,27 @@ npm run dev
 npm run build
 \`\`\`
 
-## Configuración de Firebase
+## Configuración de MySQL
 
-Para conectar con Firebase, crea un archivo `.env.local` con las siguientes variables:
+Para conectar con MySQL local, crea un archivo `.env.local` con las siguientes variables:
 
 \`\`\`env
-NEXT_PUBLIC_FIREBASE_API_KEY=tu_api_key
-NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=tu_auth_domain
-NEXT_PUBLIC_FIREBASE_PROJECT_ID=tu_project_id
-NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=tu_storage_bucket
-NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=tu_sender_id
-NEXT_PUBLIC_FIREBASE_APP_ID=tu_app_id
+DB_HOST=localhost
+DB_PORT=3306
+DB_USER=root
+DB_PASSWORD=tu_contraseña_mysql
+DB_NAME=justicia_verde
 \`\`\`
 
-## Credenciales de Prueba
+**Ver documentación completa en [MYSQL_SETUP.md](./MYSQL_SETUP.md)**
 
-### Administrador
-- **Email**: `admin@gmail.com`
-- **Contraseña**: `12345678`
-- **Acceso**: Panel de administración completo, gestión de todas las denuncias, estadísticas globales
+### Pasos rápidos:
 
-### Demandante (Ciudadano)
-- **Email**: `demandante@gmail.com`
-- **Contraseña**: `12345678`
-- **Acceso**: Crear denuncias, ver mis denuncias, seguimiento de casos propios
-
-### Visualizador/Revisor (Profesional Legal)
-- **Email**: `visualizador@gmail.com`
-- **Contraseña**: `12345678`
-- **Acceso**: Ver todas las denuncias, tomar casos, actualizar estados, comunicarse con demandantes
-
-**Nota**: Después de iniciar sesión, cada rol será redirigido automáticamente:
-- Admin → `/admin`
-- Demandante → `/mis-denuncias`
-- Visualizador → `/revisor`
+1. Instala MySQL Workbench
+2. Ejecuta `database/schema.sql` para crear las tablas
+3. Ejecuta `database/seed.sql` para insertar datos de prueba
+4. Configura `.env.local` con tus credenciales
+5. Ejecuta `npm run dev`
 
 ## Estructura del Proyecto
 
@@ -100,27 +90,50 @@ NEXT_PUBLIC_FIREBASE_APP_ID=tu_app_id
 │   ├── denuncia/       # Formulario de denuncia
 │   ├── mapa/           # Mapa interactivo
 │   ├── mis-denuncias/  # Gestión personal
-│   └── datos-abiertos/ # Estadísticas públicas
+│   ├── datos-abiertos/ # Estadísticas públicas
+│   └── api/            # API Routes para MySQL
+│       ├── auth/
+│       ├── denuncias/
+│       ├── seguimientos/
+│       └── estadisticas/
 ├── components/
 │   ├── mapa-interactivo.tsx
 │   ├── navbar.tsx
 │   └── ui/             # Componentes shadcn
+├── database/
+│   ├── schema.sql      # Esquema de base de datos
+│   └── seed.sql        # Datos de prueba
 ├── lib/
 │   ├── auth-context.tsx    # Contexto de autenticación
-│   ├── firebase-config.ts  # Configuración Firebase
-│   └── mock-data.ts        # Datos de prueba
+│   ├── db-config.ts        # Configuración MySQL
+│   ├── db-services.ts      # Servicios de base de datos
+│   └── mock-data.ts        # Datos de prueba (fallback)
 └── types/
     └── index.ts        # Tipos TypeScript
 \`\`\`
 
+## APIs Disponibles
+
+- `POST /api/auth/login` - Autenticación de usuarios
+- `GET /api/denuncias` - Obtener denuncias públicas
+- `POST /api/denuncias` - Crear nueva denuncia
+- `PATCH /api/denuncias/[id]` - Actualizar estado
+- `POST /api/denuncias/[id]/asignar` - Asignar visualizador
+- `POST /api/denuncias/[id]/like` - Dar/quitar like
+- `GET /api/seguimientos` - Obtener comentarios
+- `POST /api/seguimientos` - Agregar comentario
+- `GET /api/estadisticas` - Estadísticas generales
+
 ## Próximos Pasos
 
-1. Proporcionar credenciales de Firebase para conectar base de datos real
-2. Implementar autenticación con Firebase Auth
-3. Migrar datos mock a Firestore
-4. Implementar carga de imágenes a Firebase Storage
-5. Agregar notificaciones en tiempo real
-6. Implementar sistema de gamificación
+1. ✅ Base de datos MySQL configurada
+2. ✅ APIs REST implementadas
+3. ✅ Sistema de autenticación funcional
+4. Implementar hash de contraseñas (bcrypt)
+5. Agregar carga de archivos (multer o similar)
+6. Implementar validación de datos con Zod
+7. Agregar rate limiting para APIs
+8. Implementar notificaciones por email
 
 ## Licencia
 

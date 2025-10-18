@@ -223,7 +223,11 @@ export const denunciaService = {
         LEFT JOIN asignaciones a ON d.id_denuncia = a.id_denuncia AND a.fecha_finalizacion IS NULL
         LEFT JOIN usuarios v ON a.id_visualizador = v.id_usuario
         WHERE d.visibilidad_publica = TRUE
-        GROUP BY d.id_denuncia
+        GROUP BY d.id_denuncia, d.id_usuario, d.tipo_denuncia, d.titulo, d.descripcion, 
+                 d.ubicacion_direccion, d.ubicacion_lat, d.ubicacion_lng, d.prioridad, 
+                 d.estado, d.visibilidad_publica, d.vistas, d.compartidos, 
+                 d.fecha_creacion, d.fecha_actualizacion,
+                 u.nombre_completo, u.correo, a.id_visualizador, v.nombre_completo, v.organizacion
         ORDER BY d.fecha_creacion DESC
       `
       const results = await query<DenunciaRow[]>(sql)
@@ -257,7 +261,11 @@ export const denunciaService = {
         LEFT JOIN asignaciones a ON d.id_denuncia = a.id_denuncia AND a.fecha_finalizacion IS NULL
         LEFT JOIN usuarios v ON a.id_visualizador = v.id_usuario
         WHERE d.id_usuario = ?
-        GROUP BY d.id_denuncia
+        GROUP BY d.id_denuncia, d.id_usuario, d.tipo_denuncia, d.titulo, d.descripcion, 
+                 d.ubicacion_direccion, d.ubicacion_lat, d.ubicacion_lng, d.prioridad, 
+                 d.estado, d.visibilidad_publica, d.vistas, d.compartidos, 
+                 d.fecha_creacion, d.fecha_actualizacion,
+                 u.nombre_completo, u.correo, a.id_visualizador, v.nombre_completo, v.organizacion
         ORDER BY d.fecha_creacion DESC
       `
       const results = await query<DenunciaRow[]>(sql, [Number.parseInt(usuarioId)])
@@ -291,7 +299,11 @@ export const denunciaService = {
         LEFT JOIN reacciones r ON d.id_denuncia = r.id_denuncia
         LEFT JOIN usuarios v ON a.id_visualizador = v.id_usuario
         WHERE a.id_visualizador = ? AND a.fecha_finalizacion IS NULL
-        GROUP BY d.id_denuncia
+        GROUP BY d.id_denuncia, d.id_usuario, d.tipo_denuncia, d.titulo, d.descripcion, 
+                 d.ubicacion_direccion, d.ubicacion_lat, d.ubicacion_lng, d.prioridad, 
+                 d.estado, d.visibilidad_publica, d.vistas, d.compartidos, 
+                 d.fecha_creacion, d.fecha_actualizacion,
+                 u.nombre_completo, u.correo, a.id_visualizador, v.nombre_completo, v.organizacion
         ORDER BY d.fecha_creacion DESC
       `
       const results = await query<DenunciaRow[]>(sql, [Number.parseInt(visualizadorId)])

@@ -1,12 +1,61 @@
+"use client"
+
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { AlertTriangle, Map, Users, FileText, Shield, TrendingUp, CheckCircle, Eye, Scale } from "lucide-react"
 import Link from "next/link"
-import { mockEstadisticas, mockDenuncias } from "@/lib/mock-data"
 import { Badge } from "@/components/ui/badge"
+import type { Denuncia } from "@/types"
 
 export default function HomePage() {
-  const denunciasRecientes = mockDenuncias.slice(0, 3)
+  const [denunciasRecientes, setDenunciasRecientes] = useState<Denuncia[]>([])
+  const [estadisticas, setEstadisticas] = useState({
+    totalDenuncias: 0,
+    denunciasMes: 0,
+    denunciasResueltas: 0,
+    denunciasEnProceso: 0,
+    usuariosActivos: 0,
+    porcentajeAcompañamiento: 0,
+  })
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    async function cargarDatos() {
+      try {
+        // Cargar denuncias públicas
+        const resDenuncias = await fetch("/api/denuncias")
+        if (resDenuncias.ok) {
+          const denuncias = await resDenuncias.json()
+          setDenunciasRecientes(denuncias.slice(0, 3))
+        }
+
+        // Cargar estadísticas
+        const resEstadisticas = await fetch("/api/estadisticas")
+        if (resEstadisticas.ok) {
+          const stats = await resEstadisticas.json()
+          setEstadisticas(stats)
+        }
+      } catch (error) {
+        console.error("[v0] Error al cargar datos:", error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    cargarDatos()
+  }, [])
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Cargando...</p>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-emerald-50 to-white">
@@ -49,12 +98,12 @@ export default function HomePage() {
               <div className="flex items-center justify-between mb-4">
                 <FileText className="h-12 w-12 text-emerald-600" />
                 <div className="text-right">
-                  <div className="text-3xl font-bold text-emerald-700">{mockEstadisticas.denunciasMes}</div>
+                  <div className="text-3xl font-bold text-emerald-700">{estadisticas.denunciasMes}</div>
                   <div className="text-sm text-gray-600">este mes</div>
                 </div>
               </div>
               <h3 className="font-semibold text-gray-900">Denuncias recibidas</h3>
-              <p className="text-sm text-gray-600 mt-2">Total histórico: {mockEstadisticas.totalDenuncias} denuncias</p>
+              <p className="text-sm text-gray-600 mt-2">Total histórico: {estadisticas.totalDenuncias} denuncias</p>
             </CardContent>
           </Card>
 
@@ -63,15 +112,13 @@ export default function HomePage() {
               <div className="flex items-center justify-between mb-4">
                 <Scale className="h-12 w-12 text-emerald-600" />
                 <div className="text-right">
-                  <div className="text-3xl font-bold text-emerald-700">
-                    {mockEstadisticas.porcentajeAcompañamiento}%
-                  </div>
+                  <div className="text-3xl font-bold text-emerald-700">{estadisticas.porcentajeAcompañamiento}%</div>
                   <div className="text-sm text-gray-600">con apoyo</div>
                 </div>
               </div>
               <h3 className="font-semibold text-gray-900">Acompañamiento legal</h3>
               <p className="text-sm text-gray-600 mt-2">
-                {mockEstadisticas.denunciasResueltas} casos resueltos exitosamente
+                {estadisticas.denunciasResueltas} casos resueltos exitosamente
               </p>
             </CardContent>
           </Card>
@@ -82,7 +129,7 @@ export default function HomePage() {
                 <Users className="h-12 w-12 text-emerald-600" />
                 <div className="text-right">
                   <div className="text-3xl font-bold text-emerald-700">
-                    {mockEstadisticas.usuariosActivos.toLocaleString()}
+                    {estadisticas.usuariosActivos.toLocaleString()}
                   </div>
                   <div className="text-sm text-gray-600">usuarios</div>
                 </div>
